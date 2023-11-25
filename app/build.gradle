@@ -15,5 +15,5 @@ android {
 dependencies {
     implementation project(':aars')
     implementation project(':models')
-    implementation 'com.androidx.support:appcompat-v7:26.1.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
 }
