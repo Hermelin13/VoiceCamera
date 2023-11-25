@@ -1,0 +1,21 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 26
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 26
+    }
+}
+
+android {
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    namespace 'edu.cmu.pocketsphinx.models'
+}
+
+ant.importBuild 'assets.xml'
+preBuild.dependsOn(list, checksum)
+clean.dependsOn(clean_assets)
