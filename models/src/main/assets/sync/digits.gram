@@ -2,18 +2,6 @@
 
 grammar digits;
 
-<digit> = oh    |
-          zero  |
-          one   |
-          two   |
-          three |
-          four  |
-          five  |
-          six   |
-          seven |
-          eight |
-          nine  |
-          ten   |
-          eleven ;
+<digit> = action;
 
 public <digits> = <digit>+;

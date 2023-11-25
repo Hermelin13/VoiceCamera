@@ -59,13 +59,13 @@ public class PocketSphinxActivity extends Activity implements
 
     /* Named searches allow to quickly reconfigure the decoder */
     private static final String KWS_SEARCH = "wakeup";
-    private static final String FORECAST_SEARCH = "forecast";
-    private static final String DIGITS_SEARCH = "digits";
-    private static final String PHONE_SEARCH = "phones";
+    private static final String FORECAST = "forecast";
+    private static final String DIGITS = "digits";
+    private static final String PHONE = "phones";
     private static final String MENU_SEARCH = "menu";
 
     /* Keyword we are looking for to activate menu */
-    private static final String KEYPHRASE = "computer";
+    private static final String KEYPHRASE = "start";
 
     /* Used to handle permission request */
     private static final int PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
@@ -81,9 +81,9 @@ public class PocketSphinxActivity extends Activity implements
         captions = new HashMap<>();
         captions.put(KWS_SEARCH, R.string.kws_caption);
         captions.put(MENU_SEARCH, R.string.menu_caption);
-        captions.put(DIGITS_SEARCH, R.string.digits_caption);
-        captions.put(PHONE_SEARCH, R.string.phone_caption);
-        captions.put(FORECAST_SEARCH, R.string.forecast_caption);
+        captions.put(DIGITS, R.string.digits_caption);
+        captions.put(PHONE, R.string.phone_caption);
+        captions.put(FORECAST, R.string.forecast_caption);
         setContentView(R.layout.main);
         ((TextView) findViewById(R.id.caption_text))
                 .setText("Preparing the recognizer");
@@ -163,16 +163,24 @@ public class PocketSphinxActivity extends Activity implements
             return;
 
         String text = hypothesis.getHypstr();
-        if (text.equals(KEYPHRASE))
-            switchSearch(MENU_SEARCH);
-        else if (text.equals(DIGITS_SEARCH))
-            switchSearch(DIGITS_SEARCH);
-        else if (text.equals(PHONE_SEARCH))
-            switchSearch(PHONE_SEARCH);
-        else if (text.equals(FORECAST_SEARCH))
-            switchSearch(FORECAST_SEARCH);
-        else
-            ((TextView) findViewById(R.id.result_text)).setText(text);
+        switch (text) {
+            case "action":
+            case KEYPHRASE:
+                switchSearch(MENU_SEARCH);
+                break;
+            case DIGITS:
+                switchSearch(DIGITS);
+                break;
+            case PHONE:
+                switchSearch(PHONE);
+                break;
+            case FORECAST:
+                switchSearch(FORECAST);
+                break;
+            default:
+                ((TextView) findViewById(R.id.result_text)).setText(text);
+                break;
+        }
     }
 
     /**
@@ -231,7 +239,8 @@ public class PocketSphinxActivity extends Activity implements
          */
 
         // Create keyword-activation search.
-        recognizer.addKeyphraseSearch(KWS_SEARCH, KEYPHRASE);
+        File keywordFile = new File(assetsDir, "keywords");
+        recognizer.addKeywordSearch(KWS_SEARCH, keywordFile);
 
         // Create grammar-based search for selection between demos
         File menuGrammar = new File(assetsDir, "menu.gram");
@@ -239,15 +248,15 @@ public class PocketSphinxActivity extends Activity implements
 
         // Create grammar-based search for digit recognition
         File digitsGrammar = new File(assetsDir, "digits.gram");
-        recognizer.addGrammarSearch(DIGITS_SEARCH, digitsGrammar);
+        recognizer.addGrammarSearch(DIGITS, digitsGrammar);
 
         // Create language model search
         File languageModel = new File(assetsDir, "weather.dmp");
-        recognizer.addNgramSearch(FORECAST_SEARCH, languageModel);
+        recognizer.addNgramSearch(FORECAST, languageModel);
 
         // Phonetic search
         File phoneticModel = new File(assetsDir, "en-phone.dmp");
-        recognizer.addAllphoneSearch(PHONE_SEARCH, phoneticModel);
+        recognizer.addAllphoneSearch(PHONE, phoneticModel);
     }
 
     @Override
