@@ -1,4 +1,4 @@
-package edu.cmu.pocketsphinx.demo;
+package edu.cmu.pocketsphinx;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -45,12 +45,6 @@ import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 
-import edu.cmu.pocketsphinx.Assets;
-import edu.cmu.pocketsphinx.Hypothesis;
-import edu.cmu.pocketsphinx.RecognitionListener;
-import edu.cmu.pocketsphinx.SpeechRecognizer;
-import edu.cmu.pocketsphinx.SpeechRecognizerSetup;
-
 
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -73,8 +67,11 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     });
 
     private static final String MAIN = "wakeup";
-    private static final String KEYPHRASE = "action";
-    private static final String KEYPHOTO = "digits";
+    private static final String KEYVIDEOSHORT = "action";
+    private static final String KEYPHOTOSHORT = "snap it";
+    private static final String KEYVIDEO = "take video";
+    private static final String KEYPHOTO = "take picture";
+
     private static final int PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
     private SpeechRecognizer recognizer;
 
@@ -179,11 +176,11 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         String text = hypothesis.getHypstr();
         Log.d("SpeechRecognition", "Partial Result: " + text);
 
-        if (text.equals(KEYPHRASE)) {
+        if (text.equals(KEYVIDEOSHORT) || text.equals(KEYVIDEO)) {
             makeText(getApplicationContext(), "Keyword Spotted: " + text, Toast.LENGTH_SHORT).show();
             captureVideo();
         }
-        else if (text.equals(KEYPHOTO)) {
+        else if (text.equals(KEYPHOTOSHORT) || text.equals(KEYPHOTO)) {
             takePicture();
             makeText(getApplicationContext(), "Keyword Spotted: " + text, Toast.LENGTH_SHORT).show();
         }
@@ -230,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
                 .getRecognizer();
         recognizer.addListener(this);
 
-        File menuGrammar = new File(assetsDir, "menu.gram");
+        File menuGrammar = new File(assetsDir, "keywords");
         recognizer.addKeywordSearch(MAIN, menuGrammar);
     }
 
