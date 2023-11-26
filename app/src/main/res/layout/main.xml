@@ -1,28 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical"
-    android:padding="16dp" >
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/caption_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:typeface="sans" />
-
-    <LinearLayout
+    <androidx.camera.view.PreviewView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center" >
+        android:layout_height="match_parent"
+        android:id="@+id/cameraPreview"/>
 
-        <TextView
-            android:id="@+id/result_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-    </LinearLayout>
-</LinearLayout>
+    <ImageButton
+        android:layout_width="60sp"
+        android:layout_height="60sp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="40sp"
+        android:id="@+id/capture"
+        android:scaleType="centerCrop"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:tint="#fff" />
+
+    <ImageButton
+        android:layout_width="40sp"
+        android:layout_height="40sp"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="10sp"
+        android:src="@drawable/baseline_flash_on_24"
+        app:tint="#fff"
+        android:id="@+id/toggleFlash"
+        android:background="?attr/selectableItemBackgroundBorderless" />
+
+    <ImageButton
+        android:layout_width="40sp"
+        android:layout_height="40sp"
+        android:layout_below="@id/toggleFlash"
+        android:layout_marginEnd="10sp"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/flipCamera"
+        android:src="@drawable/baseline_cameraswitch_24"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:tint="#fff" />
+
+</RelativeLayout>

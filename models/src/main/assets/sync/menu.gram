@@ -1,5 +1,4 @@
-#JSGF V1.0;
-
-grammar menu;
-
-public <item> = take photo | action | cheese;
+forecast
+action
+start
+digits
