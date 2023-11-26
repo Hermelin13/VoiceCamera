@@ -34,7 +34,6 @@ import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -73,7 +72,6 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         }
     });
 
-
     private static final String MAIN = "wakeup";
     private static final String KEYPHRASE = "action";
     private static final String KEYPHOTO = "digits";
@@ -110,8 +108,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSIONS_REQUEST_RECORD_AUDIO);
             return;
         }
-        // Recognizer initialization is a time-consuming and it involves IO,
-        // so we execute it in async task
+
         new SetupTask(this).execute();
     }
 
@@ -151,8 +148,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 
         if (requestCode == PERMISSIONS_REQUEST_RECORD_AUDIO) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Recognizer initialization is a time-consuming and it involves IO,
-                // so we execute it in async task
+
                 new SetupTask(this).execute();
             } else {
                 finish();
@@ -185,8 +181,10 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 
         if (text.equals(KEYPHRASE)) {
             makeText(getApplicationContext(), "Keyword Spotted: " + text, Toast.LENGTH_SHORT).show();
+            captureVideo();
         }
         else if (text.equals(KEYPHOTO)) {
+            takePicture();
             makeText(getApplicationContext(), "Keyword Spotted: " + text, Toast.LENGTH_SHORT).show();
         }
     }
@@ -243,7 +241,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 
     @Override
     public void onTimeout() {
-        // This method is not used for continuous keyword spotting.
+
     }
 
     public void startCamera(int cameraFacing) {
