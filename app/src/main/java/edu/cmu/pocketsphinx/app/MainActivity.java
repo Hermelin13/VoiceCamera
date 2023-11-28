@@ -75,9 +75,9 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 
     private static final String MAIN = "wakeup";
     private static final String KEYVIDEOSHORT = "action";
-    private static final String KEYPHOTOSHORT = "snap it";
+    private static final String KEYPHOTOSHORT = "picture";
     private static final String KEYVIDEO = "take video";
-    private static final String KEYPHOTO = "take picture";
+    private static final String KEYPHOTO = "take photo";
 
     private static final int PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
     private SpeechRecognizer recognizer;
