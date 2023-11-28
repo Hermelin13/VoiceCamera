@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
-    <string name="app_name">PocketSphinx</string>
+    <string name="app_name">VoiceCapture</string>
     
     <string name="kws_caption">To start demonstration say \"start\".</string>
     <string name="menu_caption">Say \"digits\", \"forecast\" or \"action\" to choose the grammar, language model or phonetic decoder example.</string>
