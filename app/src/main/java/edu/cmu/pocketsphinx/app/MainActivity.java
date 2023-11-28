@@ -1,4 +1,4 @@
-package edu.cmu.pocketsphinx;
+package edu.cmu.pocketsphinx.app;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -49,6 +49,13 @@ import java.util.concurrent.Executors;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import static android.widget.Toast.makeText;
+
+import edu.cmu.pocketsphinx.Assets;
+import edu.cmu.pocketsphinx.Hypothesis;
+import edu.cmu.pocketsphinx.app.R;
+import edu.cmu.pocketsphinx.RecognitionListener;
+import edu.cmu.pocketsphinx.SpeechRecognizer;
+import edu.cmu.pocketsphinx.SpeechRecognizerSetup;
 
 
 public class MainActivity extends AppCompatActivity implements RecognitionListener {
