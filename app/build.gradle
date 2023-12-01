@@ -8,7 +8,7 @@ android {
         applicationId "edu.cmu.pocketsphinx.app"
         minSdkVersion 22
         targetSdkVersion 34
-        versionCode 2
+        versionCode 3
         versionName "1.0"
     }
 
