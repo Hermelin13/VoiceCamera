@@ -43,6 +43,7 @@ import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 
@@ -74,8 +75,8 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     });
 
     private static final String MAIN = "wakeup";
-    private static final String KEYVIDEOSHORT = "record";
-    private static final String KEYPHOTOSHORT = "action";
+    private static final String KEYVIDEOSHORT = "recording";
+    private static final String KEYPHOTOSHORT = "photograph";
     private static final int PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
     private SpeechRecognizer recognizer;
 
@@ -171,34 +172,19 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     @SuppressLint("SetTextI18n")
     @Override
     public void onPartialResult(Hypothesis hypothesis) {
-        if (hypothesis == null)
-            return;
 
-        /*String text = hypothesis.getHypstr();
-        Log.d("SpeechRecognition", "Partial Result: " + text);
-
-        if (text.equals(KEYVIDEOSHORT) || text.equals(KEYVIDEO)) {
-            makeText(getApplicationContext(), "Keyword Spotted: " + text, Toast.LENGTH_SHORT).show();
-            captureVideo();
-        }
-        else if (text.equals(KEYPHOTOSHORT) || text.equals(KEYPHOTO)) {
-            takePicture();
-            makeText(getApplicationContext(), "Keyword Spotted: " + text, Toast.LENGTH_SHORT).show();
-        }*/
     }
 
     @Override
     public void onResult(Hypothesis hypothesis) {
         if (hypothesis != null) {
-
             String text = hypothesis.getHypstr();
             if (text.equals(KEYVIDEOSHORT)) {
                 makeText(getApplicationContext(), "Keyword Spotted: " + text, Toast.LENGTH_SHORT).show();
-                captureVideo();
-            }
-            else if (text.equals(KEYPHOTOSHORT)) {
-                takePicture();
+                captureVideo().thenRun(() -> recognizer.startListening(MAIN));
+            } else if (text.equals(KEYPHOTOSHORT)) {
                 makeText(getApplicationContext(), "Keyword Spotted: " + text, Toast.LENGTH_SHORT).show();
+                takePicture().thenRun(() -> recognizer.startListening(MAIN));
             }
         }
         recognizer.startListening(MAIN);
@@ -280,12 +266,14 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         }, ContextCompat.getMainExecutor(this));
     }
 
-    public void captureVideo() {
+    public CompletableFuture<Void> captureVideo() {
+        CompletableFuture<Void> future = new CompletableFuture<>();
+
         Recording recording1 = recording;
         if (recording1 != null) {
             recording1.stop();
             recording = null;
-            return;
+            return future;
         }
         String name = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.getDefault()).format(System.currentTimeMillis());
         ContentValues contentValues = new ContentValues();
@@ -297,7 +285,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
                 .build();
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            return;
+            return future;
         }
         recording = videoCapture.getOutput().prepareRecording(MainActivity.this, options).withAudioEnabled().start(ContextCompat.getMainExecutor(MainActivity.this), videoRecordEvent -> {
             if (videoRecordEvent instanceof VideoRecordEvent.Start) {
@@ -325,10 +313,13 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
                     Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
                 }
             }
+            future.complete(null);
         });
+        return future;
     }
 
-    public void takePicture() {
+    public CompletableFuture<Void> takePicture() {
+        CompletableFuture<Void> future = new CompletableFuture<>();
         final File picturesDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
         if (!picturesDirectory.exists()) {
             picturesDirectory.mkdirs();
@@ -349,14 +340,17 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 
                 runOnUiThread(() -> Toast.makeText(MainActivity.this, "Image saved at: " + file.getPath(), Toast.LENGTH_SHORT).show());
                 startCamera(cameraFacing);
+                future.complete(null);
             }
 
             @Override
             public void onError(@NonNull ImageCaptureException exception) {
                 runOnUiThread(() -> Toast.makeText(MainActivity.this, "Failed to save: " + exception.getMessage(), Toast.LENGTH_SHORT).show());
                 startCamera(cameraFacing);
+                future.completeExceptionally(exception);
             }
         });
+        return future;
     }
 
     private void setFlashIcon(Camera camera) {
