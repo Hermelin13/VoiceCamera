@@ -74,11 +74,8 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     });
 
     private static final String MAIN = "wakeup";
-    private static final String KEYVIDEOSHORT = "action";
-    private static final String KEYPHOTOSHORT = "picture";
-    private static final String KEYVIDEO = "take video";
-    private static final String KEYPHOTO = "take photo";
-
+    private static final String KEYVIDEOSHORT = "record";
+    private static final String KEYPHOTOSHORT = "action";
     private static final int PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
     private SpeechRecognizer recognizer;
 
@@ -92,10 +89,15 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         toggleFlash = findViewById(R.id.toggleFlash);
         flipCamera = findViewById(R.id.flipCamera);
 
-        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            cameraPermissionLauncher.launch(Manifest.permission.CAMERA);
+        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED)
+        {
+            String[] permissions = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO};
+            ActivityCompat.requestPermissions(this, permissions, PERMISSIONS_REQUEST_RECORD_AUDIO);
         } else {
             startCamera(cameraFacing);
+            new SetupTask(this).execute();
         }
 
         flipCamera.setOnClickListener(view -> {
@@ -106,14 +108,6 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
             }
             startCamera(cameraFacing);
         });
-
-        int permissionCheck = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.RECORD_AUDIO);
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSIONS_REQUEST_RECORD_AUDIO);
-            return;
-        }
-
-        new SetupTask(this).execute();
     }
 
     private static class SetupTask extends AsyncTask<Void, Void, Exception> {
@@ -146,13 +140,14 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == PERMISSIONS_REQUEST_RECORD_AUDIO) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED &&
+                    grantResults.length > 1 && grantResults[1] == PackageManager.PERMISSION_GRANTED &&
+                    grantResults.length > 2 && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
+                startCamera(cameraFacing);
                 new SetupTask(this).execute();
             } else {
                 finish();
@@ -201,11 +196,11 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         if (hypothesis != null) {
 
             String text = hypothesis.getHypstr();
-            if (text.equals(KEYVIDEOSHORT) || text.equals(KEYVIDEO)) {
+            if (text.equals(KEYVIDEOSHORT)) {
                 makeText(getApplicationContext(), "Keyword Spotted: " + text, Toast.LENGTH_SHORT).show();
                 captureVideo();
             }
-            else if (text.equals(KEYPHOTOSHORT) || text.equals(KEYPHOTO)) {
+            else if (text.equals(KEYPHOTOSHORT)) {
                 takePicture();
                 makeText(getApplicationContext(), "Keyword Spotted: " + text, Toast.LENGTH_SHORT).show();
             }
