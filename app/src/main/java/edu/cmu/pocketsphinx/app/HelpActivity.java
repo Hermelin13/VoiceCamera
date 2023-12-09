@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageButton;
 
-public class Main2Activity extends AppCompatActivity {
+public class HelpActivity extends AppCompatActivity {
 
     ImageButton back;
 

@@ -27,7 +27,7 @@
         android:theme="@style/AppTheme"
         tools:targetApi="34">
         <activity
-            android:name=".Main2Activity"
+            android:name=".HelpActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

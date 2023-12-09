@@ -34,7 +34,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -383,7 +382,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     }
 
     public void openHelp(){
-        Intent intent = new Intent(this, Main2Activity.class);
+        Intent intent = new Intent(this, HelpActivity.class);
         startActivity(intent);
     }
 }

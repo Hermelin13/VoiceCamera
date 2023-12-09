@@ -3,7 +3,10 @@
     <!-- Base application theme -->
     <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your theme here -->
-
+        <item name="colorPrimary">@color/colorPrimary</item>
         <!-- Add other theme attributes as needed -->
     </style>
+
+    <!-- Define your blue color -->
+    <color name="colorPrimary">#0000d1</color>
 </resources>
