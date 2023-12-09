@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         if (hypothesis == null)
             return;
 
-        String text = hypothesis.getHypstr();
+        /*String text = hypothesis.getHypstr();
         Log.d("SpeechRecognition", "Partial Result: " + text);
 
         if (text.equals(KEYVIDEOSHORT) || text.equals(KEYVIDEO)) {
@@ -190,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         else if (text.equals(KEYPHOTOSHORT) || text.equals(KEYPHOTO)) {
             takePicture();
             makeText(getApplicationContext(), "Keyword Spotted: " + text, Toast.LENGTH_SHORT).show();
-        }
+        }*/
     }
 
     /**
@@ -201,12 +201,14 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         if (hypothesis != null) {
 
             String text = hypothesis.getHypstr();
-            /*if (text.equals(KEYPHRASE)){
-                makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
+            if (text.equals(KEYVIDEOSHORT) || text.equals(KEYVIDEO)) {
+                makeText(getApplicationContext(), "Keyword Spotted: " + text, Toast.LENGTH_SHORT).show();
+                captureVideo();
             }
-            if (text.equals(KEYPHOTO)){
-                makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
-            }*/
+            else if (text.equals(KEYPHOTOSHORT) || text.equals(KEYPHOTO)) {
+                takePicture();
+                makeText(getApplicationContext(), "Keyword Spotted: " + text, Toast.LENGTH_SHORT).show();
+            }
         }
         recognizer.startListening(MAIN);
     }
