@@ -3,6 +3,6 @@
 
     <string name="app_name">VoiceCapture</string>
 
-    <string name="keywords">Take picture by saying \"action\".\n\n
-        Take video by saying \"record\".</string>
+    <string name="keywords">Take picture by saying \"photograph\".\n\n
+        Take video by saying \"recording\".</string>
 </resources>
