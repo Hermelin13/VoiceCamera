@@ -2,7 +2,7 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
     <string name="app_name">VoiceCapture</string>
-    
-    <string name="kws_caption">To start demonstration say \"start\".</string>
-    <string name="menu_caption">Say \"digits\", \"forecast\" or \"action\" to choose the grammar, language model or phonetic decoder example.</string>
+
+    <string name="keywords">Take picture by saying \"action\".\n\n
+        Take video by saying \"record\".</string>
 </resources>

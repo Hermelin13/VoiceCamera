@@ -12,8 +12,8 @@
         android:id="@+id/cameraPreview"/>
 
     <ImageButton
-        android:layout_width="60sp"
-        android:layout_height="60sp"
+        android:layout_width="0sp"
+        android:layout_height="0sp"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="40sp"
@@ -23,23 +23,35 @@
         app:tint="#fff" />
 
     <ImageButton
-        android:layout_width="40sp"
-        android:layout_height="40sp"
-        android:layout_alignParentEnd="true"
-        android:layout_margin="10sp"
-        android:src="@drawable/baseline_flash_on_24"
-        app:tint="#fff"
         android:id="@+id/toggleFlash"
+        android:layout_width="60sp"
+        android:layout_height="60sp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="20sp"
+        android:layout_marginEnd="10sp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/baseline_flash_on_24"
+        app:tint="#fff" />
+
+    <ImageButton
+        android:layout_width="60sp"
+        android:layout_height="60sp"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/toggleFlash"
+        android:layout_margin="10sp"
+        android:src="@drawable/baseline_cameraswitch_24"
+        app:tint="#fff"
+        android:id="@+id/flipCamera"
         android:background="?attr/selectableItemBackgroundBorderless" />
 
     <ImageButton
-        android:layout_width="40sp"
-        android:layout_height="40sp"
-        android:layout_below="@id/toggleFlash"
+        android:layout_width="60sp"
+        android:layout_height="60sp"
+        android:layout_below="@id/flipCamera"
         android:layout_marginEnd="10sp"
         android:layout_alignParentEnd="true"
-        android:id="@+id/flipCamera"
-        android:src="@drawable/baseline_cameraswitch_24"
+        android:id="@+id/question"
+        android:src="@drawable/baseline_question_mark_24"
         android:background="?attr/selectableItemBackgroundBorderless"
         app:tint="#fff" />
 

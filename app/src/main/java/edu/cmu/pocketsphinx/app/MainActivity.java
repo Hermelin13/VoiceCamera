@@ -3,6 +3,7 @@ package edu.cmu.pocketsphinx.app;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -33,6 +34,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -52,7 +54,6 @@ import static android.widget.Toast.makeText;
 
 import edu.cmu.pocketsphinx.Assets;
 import edu.cmu.pocketsphinx.Hypothesis;
-import edu.cmu.pocketsphinx.app.R;
 import edu.cmu.pocketsphinx.RecognitionListener;
 import edu.cmu.pocketsphinx.SpeechRecognizer;
 import edu.cmu.pocketsphinx.SpeechRecognizerSetup;
@@ -62,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 
     Recording recording = null;
     VideoCapture<Recorder> videoCapture = null;
-    ImageButton capture, toggleFlash, flipCamera;
+    ImageButton capture, toggleFlash, flipCamera, question;
     PreviewView previewView;
     int cameraFacing = CameraSelector.LENS_FACING_BACK;
     private ImageCapture imageCapture;
@@ -88,6 +89,9 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         capture = findViewById(R.id.capture);
         toggleFlash = findViewById(R.id.toggleFlash);
         flipCamera = findViewById(R.id.flipCamera);
+        question = findViewById(R.id.question);
+
+        question.setOnClickListener(v -> openHelp());
 
         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
                 ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
@@ -165,10 +169,6 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         }
     }
 
-    /**
-     * In partial result we get quick updates about current hypothesis.
-     * In keyword spotting mode, react when the keyword is spotted.
-     */
     @SuppressLint("SetTextI18n")
     @Override
     public void onPartialResult(Hypothesis hypothesis) {
@@ -188,9 +188,6 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         }*/
     }
 
-    /**
-     * This callback is called when we stop the recognizer.
-     */
     @Override
     public void onResult(Hypothesis hypothesis) {
         if (hypothesis != null) {
@@ -212,9 +209,6 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     public void onBeginningOfSpeech() {
     }
 
-    /**
-     * We stop recognizer here to get a final result
-     */
     @Override
     public void onEndOfSpeech() {
         recognizer.stop();
@@ -386,5 +380,10 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
             return AspectRatio.RATIO_4_3;
         }
         return AspectRatio.RATIO_16_9;
+    }
+
+    public void openHelp(){
+        Intent intent = new Intent(this, Main2Activity.class);
+        startActivity(intent);
     }
 }
