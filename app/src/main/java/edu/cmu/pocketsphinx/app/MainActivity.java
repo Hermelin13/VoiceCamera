@@ -179,10 +179,10 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     public void onResult(Hypothesis hypothesis) {
         if (hypothesis != null) {
             String text = hypothesis.getHypstr();
-            if (text.equals(KEYVIDEOSHORT)) {
+            if (text.contains(KEYVIDEOSHORT)) {
                 makeText(getApplicationContext(), "Keyword Spotted: " + text, Toast.LENGTH_SHORT).show();
                 captureVideo().thenRun(() -> recognizer.startListening(MAIN));
-            } else if (text.equals(KEYPHOTOSHORT)) {
+            } else if (text.contains(KEYPHOTOSHORT)) {
                 makeText(getApplicationContext(), "Keyword Spotted: " + text, Toast.LENGTH_SHORT).show();
                 takePicture().thenRun(() -> recognizer.startListening(MAIN));
             }
@@ -378,5 +378,6 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     public void openHelp(){
         Intent intent = new Intent(this, HelpActivity.class);
         startActivity(intent);
+        finish();
     }
 }
