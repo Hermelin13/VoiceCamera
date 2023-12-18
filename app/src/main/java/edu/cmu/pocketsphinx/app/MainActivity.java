@@ -47,7 +47,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 
-
 import com.google.common.util.concurrent.ListenableFuture;
 
 import static android.widget.Toast.makeText;
