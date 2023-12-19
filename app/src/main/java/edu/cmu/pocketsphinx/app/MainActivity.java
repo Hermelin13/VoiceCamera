@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     private static final String MAIN = "wakeup";
     private static final String KEYVIDEOSHORT = "recording";
     private static final String KEYPHOTOSHORT = "photograph";
-    private static final int PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
+    private static final int PERMISSIONS_REQUEST = 1;
     private SpeechRecognizer recognizer;
 
     @Override
@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
                 ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED)
         {
             String[] permissions = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO};
-            ActivityCompat.requestPermissions(this, permissions, PERMISSIONS_REQUEST_RECORD_AUDIO);
+            ActivityCompat.requestPermissions(this, permissions, PERMISSIONS_REQUEST);
         } else {
             startCamera(cameraFacing);
             new SetupTask(this).execute();
@@ -146,7 +146,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (requestCode == PERMISSIONS_REQUEST_RECORD_AUDIO) {
+        if (requestCode == PERMISSIONS_REQUEST) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED &&
                     grantResults.length > 1 && grantResults[1] == PackageManager.PERMISSION_GRANTED &&
                     grantResults.length > 2 && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
