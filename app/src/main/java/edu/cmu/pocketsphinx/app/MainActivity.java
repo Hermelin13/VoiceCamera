@@ -5,14 +5,14 @@ import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.*;
 import androidx.annotation.NonNull;
-import androidx.camera.core.AspectRatio;
 import androidx.camera.core.Camera;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageCapture;
@@ -32,6 +32,7 @@ import androidx.core.content.ContextCompat;
 
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.ImageButton;
@@ -43,13 +44,12 @@ import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
 
 import com.google.common.util.concurrent.ListenableFuture;
-
-import static android.widget.Toast.makeText;
 
 import edu.cmu.pocketsphinx.Assets;
 import edu.cmu.pocketsphinx.Hypothesis;
@@ -66,18 +66,12 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     PreviewView previewView;
     int cameraFacing = CameraSelector.LENS_FACING_BACK;
     private ImageCapture imageCapture;
-
-    private final ActivityResultLauncher<String> cameraPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), result -> {
-        if (result) {
-            startCamera(cameraFacing);
-        }
-    });
-
     private static final String MAIN = "wakeup";
-    private static final String KEYVIDEOSHORT = "recording";
-    private static final String KEYPHOTOSHORT = "photograph";
+    private static final String KEYVIDEO = "recording";
+    private static final String KEYPHOTO = "photograph";
     private static final int PERMISSIONS_REQUEST = 1;
     private SpeechRecognizer recognizer;
+    private ToneGenerator toneGenerator;
 
     @Override
     public void onCreate(Bundle state) {
@@ -90,13 +84,14 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         flipCamera = findViewById(R.id.flipCamera);
         question = findViewById(R.id.question);
 
+        toneGenerator = new ToneGenerator(AudioManager.STREAM_ALARM, 100);
         question.setOnClickListener(v -> openHelp());
 
+        // Request audio permission
         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
                 ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED)
         {
-            String[] permissions = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO};
+            String[] permissions = {Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO};
             ActivityCompat.requestPermissions(this, permissions, PERMISSIONS_REQUEST);
         } else {
             startCamera(cameraFacing);
@@ -113,32 +108,29 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         });
     }
 
-    private static class SetupTask extends AsyncTask<Void, Void, Exception> {
-        WeakReference<MainActivity> activityReference;
+    public static class SetupTask {
 
-        SetupTask(MainActivity activity) {
+        private final WeakReference<MainActivity> activityReference;
+
+        public SetupTask(MainActivity activity) {
             this.activityReference = new WeakReference<>(activity);
         }
 
-        @Override
-        protected Exception doInBackground(Void... params) {
-            try {
-                Assets assets = new Assets(activityReference.get());
-                File assetDir = assets.syncAssets();
-                activityReference.get().setupRecognizer(assetDir);
-            } catch (IOException e) {
-                return e;
-            }
-            return null;
-        }
+        public void execute() {
+            new Thread(() -> {
+                try {
+                    Assets assets = new Assets(activityReference.get());
+                    File assetDir = assets.syncAssets();
+                    activityReference.get().setupRecognizer(assetDir);
 
-        @Override
-        protected void onPostExecute(Exception result) {
-            if (result != null) {
-                Log.d("SpeechRecognition", "Failed to init recognizer " + result);
-            } else {
-                activityReference.get().startSpotting();
-            }
+                    // Use a Handler to post back to the main thread
+                    new Handler(Looper.getMainLooper()).post(() -> activityReference.get().startSpotting());
+
+                } catch (IOException e) {
+                    // Handle the exception
+                    Log.d("SpeechRecognition", "Failed to init recognizer " + e);
+                }
+            }).start();
         }
     }
 
@@ -148,8 +140,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 
         if (requestCode == PERMISSIONS_REQUEST) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED &&
-                    grantResults.length > 1 && grantResults[1] == PackageManager.PERMISSION_GRANTED &&
-                    grantResults.length > 2 && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
+                    grantResults.length > 1 && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
                 startCamera(cameraFacing);
                 new SetupTask(this).execute();
             } else {
@@ -161,6 +152,11 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        if (toneGenerator != null) {
+            toneGenerator.release();
+            toneGenerator = null;
+        }
 
         if (recognizer != null) {
             recognizer.cancel();
@@ -178,11 +174,13 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     public void onResult(Hypothesis hypothesis) {
         if (hypothesis != null) {
             String text = hypothesis.getHypstr();
-            if (text.contains(KEYVIDEOSHORT)) {
-                makeText(getApplicationContext(), "Keyword Spotted: " + text, Toast.LENGTH_SHORT).show();
+            if (text.contains(KEYVIDEO)) {
+                playBeep(ToneGenerator.TONE_PROP_BEEP);
+                Log.e("RECOGNITION", "Keyword Spotted: " + KEYVIDEO);
                 captureVideo().thenRun(() -> recognizer.startListening(MAIN));
-            } else if (text.contains(KEYPHOTOSHORT)) {
-                makeText(getApplicationContext(), "Keyword Spotted: " + text, Toast.LENGTH_SHORT).show();
+            } else if (text.contains(KEYPHOTO)) {
+                playBeep(ToneGenerator.TONE_PROP_BEEP);
+                Log.e("RECOGNITION", "Keyword Spotted: " + KEYPHOTO);
                 takePicture().thenRun(() -> recognizer.startListening(MAIN));
             }
         }
@@ -224,17 +222,16 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     }
 
     public void startCamera(int cameraFacing) {
-        int aspectRatio = aspectRatio(previewView.getWidth(), previewView.getHeight());
         ListenableFuture<ProcessCameraProvider> listenableFuture = ProcessCameraProvider.getInstance(this);
 
         listenableFuture.addListener(() -> {
             try {
                 ProcessCameraProvider cameraProvider = listenableFuture.get();
 
-                Preview preview = new Preview.Builder().setTargetAspectRatio(aspectRatio).build();
+                Preview preview = new Preview.Builder().build();
 
                 imageCapture = new ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-                        .setTargetRotation(getWindowManager().getDefaultDisplay().getRotation()).build();
+                        .setTargetRotation((int) previewView.getRotation()).build();
 
                 Recorder recorder = new Recorder.Builder()
                         .setQualitySelector(QualitySelector.from(Quality.HIGHEST))
@@ -247,14 +244,6 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
                 cameraProvider.unbindAll();
 
                 Camera camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, videoCapture, imageCapture);
-
-                capture.setOnClickListener(view -> {
-                    if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                        cameraPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-                    } else {
-                        captureVideo();
-                    }
-                });
 
                 toggleFlash.setOnClickListener(view -> setFlashIcon(camera));
 
@@ -274,18 +263,22 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
             recording = null;
             return future;
         }
+
         String name = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.getDefault()).format(System.currentTimeMillis());
         ContentValues contentValues = new ContentValues();
         contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, name);
         contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4");
-        contentValues.put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/CameraX-Video");
+        contentValues.put(MediaStore.Video.Media.RELATIVE_PATH, Environment.DIRECTORY_MOVIES); // Specify Movies directory
 
-        MediaStoreOutputOptions options = new MediaStoreOutputOptions.Builder(getContentResolver(), MediaStore.Video.Media.EXTERNAL_CONTENT_URI)
-                .build();
+        MediaStoreOutputOptions options = new MediaStoreOutputOptions.Builder(
+                getContentResolver(),
+                MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+        ).build();
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             return future;
         }
+
         recording = videoCapture.getOutput().prepareRecording(MainActivity.this, options).withAudioEnabled().start(ContextCompat.getMainExecutor(MainActivity.this), videoRecordEvent -> {
             if (videoRecordEvent instanceof VideoRecordEvent.Start) {
                 capture.setEnabled(true);
@@ -294,22 +287,30 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
                 long captureDurationMillis = 5000;
 
                 // Schedule a task to stop the recording after the specified duration
-                new Handler().postDelayed(() -> {
-                    if (recording != null) {
-                        recording.stop();
-                        recording = null;
+                Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        if (recording != null) {
+                            recording.stop();
+                            recording = null;
+                            timer.cancel(); // Stop the timer after stopping the recording
+                        }
                     }
                 }, captureDurationMillis);
 
             } else if (videoRecordEvent instanceof VideoRecordEvent.Finalize) {
                 if (!((VideoRecordEvent.Finalize) videoRecordEvent).hasError()) {
-                    String msg = "Video capture succeeded: " + ((VideoRecordEvent.Finalize) videoRecordEvent).getOutputResults().getOutputUri();
+                    playBeep(ToneGenerator.TONE_CDMA_ABBR_ALERT);
+                    String msg = "Video Captured and Saved";
                     Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
                 } else {
                     recording.close();
                     recording = null;
                     String msg = "Error: " + ((VideoRecordEvent.Finalize) videoRecordEvent).getError();
-                    Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+                    String err = "Video Capture Failed ";
+                    Toast.makeText(this, err, Toast.LENGTH_SHORT).show();
+                    Log.e("VIDEO", msg);
                 }
             }
             future.complete(null);
@@ -319,36 +320,60 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 
     public CompletableFuture<Void> takePicture() {
         CompletableFuture<Void> future = new CompletableFuture<>();
-        final File picturesDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-        if (!picturesDirectory.exists()) {
-            picturesDirectory.mkdirs();
+        String nameTimeStamp = "IMG_" + System.currentTimeMillis();
+        String name = nameTimeStamp + ".jpeg";
+        ImageCapture.OutputFileOptions outputFileOptions = null;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, nameTimeStamp);
+            contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg");
+            contentValues.put(MediaStore.MediaColumns.ORIENTATION, 90);
+
+            outputFileOptions = new ImageCapture.OutputFileOptions.Builder(
+                    this.getContentResolver(),
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    contentValues
+            ).build();
+        } else {
+            File mImageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+            boolean isDirectoryCreated = mImageDir.exists() || mImageDir.mkdirs();
+
+            if (isDirectoryCreated) {
+                File file = new File(mImageDir, name);
+                outputFileOptions = new ImageCapture.OutputFileOptions.Builder(file).build();
+            }
         }
 
-        String imageFileName = "IMG_" + System.currentTimeMillis() + ".jpg";
-        final File file = new File(picturesDirectory, imageFileName);
+        assert outputFileOptions != null;
+        imageCapture.takePicture(outputFileOptions, ContextCompat.getMainExecutor(this),
+                new ImageCapture.OnImageSavedCallback() {
+                    @Override
+                    public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
+                        Log.e("IMAGE", "Image Capture Success");
 
-        ImageCapture.OutputFileOptions outputFileOptions = new ImageCapture.OutputFileOptions.Builder(file).build();
-        imageCapture.takePicture(outputFileOptions, Executors.newCachedThreadPool(), new ImageCapture.OnImageSavedCallback() {
-            @Override
-            public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
-                // Add image to the MediaStore
-                ContentValues contentValues = new ContentValues();
-                contentValues.put(MediaStore.Images.Media.DATA, file.getAbsolutePath());
-                contentValues.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
-                getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+                        // Get the saved image URI
+                        Uri savedUri = outputFileResults.getSavedUri();
+                        assert savedUri != null;
+                        //Log.v("IMAGE", "Saved Image Uri " + savedUri);
 
-                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Image saved at: " + file.getPath(), Toast.LENGTH_SHORT).show());
-                startCamera(cameraFacing);
-                future.complete(null);
-            }
+                        // Update the MediaStore to make the image appear in the gallery
+                        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                        mediaScanIntent.setData(savedUri);
+                        sendBroadcast(mediaScanIntent);
 
-            @Override
-            public void onError(@NonNull ImageCaptureException exception) {
-                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Failed to save: " + exception.getMessage(), Toast.LENGTH_SHORT).show());
-                startCamera(cameraFacing);
-                future.completeExceptionally(exception);
-            }
-        });
+                        Toast.makeText(getApplicationContext(), "Image Captured and Saved", Toast.LENGTH_SHORT).show();
+                        future.complete(null); // Complete the CompletableFuture
+                    }
+
+                    @Override
+                    public void onError(@NonNull ImageCaptureException exception) {
+                        Log.e("IMAGE", "Image Capture Failed With Exception : " + exception);
+                        Toast.makeText(MainActivity.this, "Image Capture Failed", Toast.LENGTH_SHORT).show();
+                        future.completeExceptionally(exception); // Complete the CompletableFuture exceptionally on error
+                    }
+                });
+
         return future;
     }
 
@@ -366,12 +391,12 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         }
     }
 
-    private int aspectRatio(int width, int height) {
-        double previewRatio = (double) Math.max(width, height) / Math.min(width, height);
-        if (Math.abs(previewRatio - 4.0 / 3.0) <= Math.abs(previewRatio - 16.0 / 9.0)) {
-            return AspectRatio.RATIO_4_3;
+    private void playBeep(int tone) {
+        if (toneGenerator != null) {
+            // Play a short beep with the specified volume
+            toneGenerator.startTone(tone, 400);
+
         }
-        return AspectRatio.RATIO_16_9;
     }
 
     public void openHelp(){

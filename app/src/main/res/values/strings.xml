@@ -3,6 +3,13 @@
 
     <string name="app_name">VoiceCapture</string>
 
-    <string name="keywords">Take picture by saying \"photograph\".\n\n
-        Take video by saying \"recording\".</string>
+    <string name="keywords">Take picture by saying \"photograph\".\n\nTake video by saying \"recording\".</string>
+    <string name="func">Low beep signalize recognition.\n\nHigh beep signalize end of video capture.</string>
+    <string name="flash">This icon turns on/off the back flashlight.\nFront flashlight is not accessible.</string>
+    <string name="camswitch">This icon switches the front and back cameras.</string>
+    <string name="backbutton">backButton</string>
+    <string name="capturing_photo">capturing photo</string>
+    <string name="turn_off_on_flashlight">turn off/on flashlight</string>
+    <string name="change_camera">change camera</string>
+    <string name="open_help">open help</string>
 </resources>

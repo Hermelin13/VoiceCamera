@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".app.MainActivity">
+    tools:context=".MainActivity">
 
     <androidx.camera.view.PreviewView
         android:layout_width="match_parent"
@@ -20,7 +20,8 @@
         android:id="@+id/capture"
         android:scaleType="centerCrop"
         android:background="?attr/selectableItemBackgroundBorderless"
-        app:tint="#fff" />
+        app:tint="#fff"
+        android:contentDescription="@string/capturing_photo" />
 
     <ImageButton
         android:id="@+id/toggleFlash"
@@ -31,7 +32,8 @@
         android:layout_marginEnd="10sp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@drawable/baseline_flash_on_24"
-        app:tint="#fff" />
+        app:tint="#fff"
+        android:contentDescription="@string/turn_off_on_flashlight" />
 
     <ImageButton
         android:layout_width="60sp"
@@ -42,7 +44,8 @@
         android:src="@drawable/baseline_cameraswitch_24"
         app:tint="#fff"
         android:id="@+id/flipCamera"
-        android:background="?attr/selectableItemBackgroundBorderless" />
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/change_camera" />
 
     <ImageButton
         android:layout_width="60sp"
@@ -53,6 +56,7 @@
         android:id="@+id/question"
         android:src="@drawable/baseline_question_mark_24"
         android:background="?attr/selectableItemBackgroundBorderless"
-        app:tint="#fff" />
+        app:tint="#fff"
+        android:contentDescription="@string/open_help" />
 
 </RelativeLayout>
