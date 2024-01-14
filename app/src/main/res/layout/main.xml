@@ -11,6 +11,16 @@
         android:layout_height="match_parent"
         android:id="@+id/cameraPreview"/>
 
+    <ImageView
+        android:id="@+id/record"
+        android:layout_width="40sp"
+        android:layout_height="40sp"
+        android:layout_marginTop="25dp"
+        android:importantForAccessibility="no"
+        android:src="@drawable/baseline_circle_24"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"/>
+
     <ImageButton
         android:layout_width="0sp"
         android:layout_height="0sp"
