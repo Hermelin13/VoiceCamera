@@ -179,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
                 Log.e("RECOGNITION", "Keyword Spotted: " + KEYVIDEO);
                 captureVideo().thenRun(() -> recognizer.startListening(MAIN));
             } else if (text.contains(KEYPHOTO)) {
-                playBeep(ToneGenerator.TONE_PROP_BEEP);
+                playBeep(ToneGenerator.TONE_CDMA_ABBR_ALERT);
                 Log.e("RECOGNITION", "Keyword Spotted: " + KEYPHOTO);
                 takePicture().thenRun(() -> recognizer.startListening(MAIN));
             }
