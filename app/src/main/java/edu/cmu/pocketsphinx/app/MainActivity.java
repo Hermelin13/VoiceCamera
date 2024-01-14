@@ -223,7 +223,6 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 
     @Override
     public void onTimeout() {
-
     }
 
     public void startCamera(int cameraFacing) {
