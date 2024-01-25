@@ -288,8 +288,8 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
                 rec.setVisibility(View.VISIBLE);
                 capture.setEnabled(true);
 
-                // Set the duration for video capture (5 seconds in this example)
-                long captureDurationMillis = 5000;
+                // Set the duration for video capture (10 seconds in this example)
+                long captureDurationMillis = 10000;
 
                 // Schedule a task to stop the recording after the specified duration
                 Timer timer = new Timer();
