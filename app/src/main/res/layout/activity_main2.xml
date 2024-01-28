@@ -20,21 +20,52 @@
         android:contentDescription="@string/backbutton" />
 
     <TextView
-        android:id="@+id/keywords"
+        android:id="@+id/keywordsphoto"
         android:layout_width="300sp"
         android:layout_height="wrap_content"
         android:layout_below="@id/back"
         android:layout_marginTop="8dp"
-        android:text="@string/keywords"
+        android:text="@string/photo"
         android:textColor="#fff"
         android:textSize="20sp"
-        android:layout_marginStart="40dp"/>
+        android:layout_marginStart="40dp" />
+
+    <TextView
+        android:id="@+id/keyp"
+        android:layout_width="300sp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/keywordsphoto"
+        android:text="@string/key_photo"
+        android:textColor="#fff"
+        android:textSize="20sp"
+        android:layout_marginStart="40dp" />
+
+    <TextView
+        android:id="@+id/keywordsvideo"
+        android:layout_width="300sp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/keyp"
+        android:layout_marginTop="25dp"
+        android:text="@string/video"
+        android:textColor="#fff"
+        android:textSize="20sp"
+        android:layout_marginStart="40dp" />
+
+    <TextView
+        android:id="@+id/keyv"
+        android:layout_width="300sp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/keywordsvideo"
+        android:text="@string/key_video"
+        android:textColor="#fff"
+        android:textSize="20sp"
+        android:layout_marginStart="40dp" />
 
     <TextView
         android:id="@+id/beep"
         android:layout_width="300sp"
         android:layout_height="wrap_content"
-        android:layout_below="@id/keywords"
+        android:layout_below="@id/keyv"
         android:layout_marginStart="40dp"
         android:layout_marginTop="20dp"
         android:text="@string/func"

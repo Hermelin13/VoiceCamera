@@ -70,8 +70,8 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     int cameraFacing = CameraSelector.LENS_FACING_BACK;
     private ImageCapture imageCapture;
     private static final String MAIN = "wakeup";
-    private static final String KEYVIDEO = "recording";
-    private static final String KEYPHOTO = "photograph";
+    String KEYVIDEO;
+    String KEYPHOTO;
     private static final int PERMISSIONS_REQUEST = 1;
     private SpeechRecognizer recognizer;
     private ToneGenerator toneGenerator;
@@ -88,6 +88,9 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         question = findViewById(R.id.question);
         rec = findViewById(R.id.record);
         rec.setVisibility(View.INVISIBLE);
+
+        KEYVIDEO = getString(R.string.key_video);
+        KEYPHOTO = getString(R.string.key_photo);
 
         toneGenerator = new ToneGenerator(AudioManager.STREAM_ALARM, 100);
         question.setOnClickListener(v -> openHelp());
@@ -177,16 +180,34 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 
     @Override
     public void onResult(Hypothesis hypothesis) {
+        int delayInSeconds = 3;
         if (hypothesis != null) {
             String text = hypothesis.getHypstr();
             if (text.contains(KEYVIDEO)) {
-                playBeep(ToneGenerator.TONE_PROP_BEEP);
                 Log.e("RECOGNITION", "Keyword Spotted: " + KEYVIDEO);
-                captureVideo().thenRun(() -> recognizer.startListening(MAIN));
+                try {
+                    for (int i = 0; i < delayInSeconds; i++) {
+                        playBeep(ToneGenerator.TONE_PROP_BEEP);
+                        Thread.sleep(1000);
+                    }
+                    playBeep(ToneGenerator.TONE_CDMA_ABBR_ALERT);
+                    captureVideo().thenRun(() -> recognizer.startListening(MAIN));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             } else if (text.contains(KEYPHOTO)) {
-                playBeep(ToneGenerator.TONE_CDMA_ABBR_ALERT);
                 Log.e("RECOGNITION", "Keyword Spotted: " + KEYPHOTO);
-                takePicture().thenRun(() -> recognizer.startListening(MAIN));
+                try {
+                    for (int i = 0; i < delayInSeconds; i++) {
+                        playBeep(ToneGenerator.TONE_PROP_BEEP);
+                        Thread.sleep(1000);
+                    }
+                    playBeep(ToneGenerator.TONE_CDMA_ABBR_ALERT);
+
+                    takePicture().thenRun(() -> recognizer.startListening(MAIN));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
         recognizer.startListening(MAIN);
