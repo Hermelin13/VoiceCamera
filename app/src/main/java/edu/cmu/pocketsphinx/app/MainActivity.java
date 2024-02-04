@@ -99,20 +99,17 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
             if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
                     ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
-                    ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED)
-            {
+                    ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
                 String[] permissions = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO};
                 ActivityCompat.requestPermissions(this, permissions, PERMISSIONS_REQUEST);
             } else {
                 startCamera(cameraFacing);
                 new SetupTask(this).execute();
             }
-        }
-        else {
+        } else {
             // Request audio permission
             if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
-                    ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED)
-            {
+                    ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
                 String[] permissions = {Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO};
                 ActivityCompat.requestPermissions(this, permissions, PERMISSIONS_REQUEST);
             } else {
@@ -453,7 +450,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         }
     }
 
-    public void openHelp(){
+    public void openHelp() {
         Intent intent = new Intent(this, HelpActivity.class);
         startActivity(intent);
         finish();

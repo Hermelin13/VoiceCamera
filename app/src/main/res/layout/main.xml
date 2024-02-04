@@ -7,31 +7,31 @@
     tools:context=".MainActivity">
 
     <androidx.camera.view.PreviewView
+        android:id="@+id/cameraPreview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/cameraPreview"/>
+        android:layout_height="match_parent" />
 
     <ImageView
         android:id="@+id/record"
         android:layout_width="40sp"
         android:layout_height="40sp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
         android:layout_marginTop="25dp"
         android:importantForAccessibility="no"
-        android:src="@drawable/baseline_circle_24"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"/>
+        android:src="@drawable/baseline_circle_24" />
 
     <ImageButton
+        android:id="@+id/capture"
         android:layout_width="0sp"
         android:layout_height="0sp"
-        android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
         android:layout_marginBottom="40sp"
-        android:id="@+id/capture"
-        android:scaleType="centerCrop"
         android:background="?attr/selectableItemBackgroundBorderless"
-        app:tint="#fff"
-        android:contentDescription="@string/capturing_photo" />
+        android:contentDescription="@string/capturing_photo"
+        android:scaleType="centerCrop"
+        app:tint="#fff" />
 
     <ImageButton
         android:id="@+id/toggleFlash"
@@ -41,32 +41,32 @@
         android:layout_marginTop="20sp"
         android:layout_marginEnd="10sp"
         android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/turn_off_on_flashlight"
         android:src="@drawable/baseline_flash_on_24"
-        app:tint="#fff"
-        android:contentDescription="@string/turn_off_on_flashlight" />
+        app:tint="#fff" />
 
     <ImageButton
+        android:id="@+id/flipCamera"
         android:layout_width="60sp"
         android:layout_height="60sp"
-        android:layout_alignParentEnd="true"
         android:layout_below="@id/toggleFlash"
+        android:layout_alignParentEnd="true"
         android:layout_margin="10sp"
-        android:src="@drawable/baseline_cameraswitch_24"
-        app:tint="#fff"
-        android:id="@+id/flipCamera"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="@string/change_camera" />
+        android:contentDescription="@string/change_camera"
+        android:src="@drawable/baseline_cameraswitch_24"
+        app:tint="#fff" />
 
     <ImageButton
+        android:id="@+id/question"
         android:layout_width="60sp"
         android:layout_height="60sp"
         android:layout_below="@id/flipCamera"
-        android:layout_marginEnd="10sp"
         android:layout_alignParentEnd="true"
-        android:id="@+id/question"
-        android:src="@drawable/baseline_question_mark_24"
+        android:layout_marginEnd="10sp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        app:tint="#fff"
-        android:contentDescription="@string/open_help" />
+        android:contentDescription="@string/open_help"
+        android:src="@drawable/baseline_question_mark_24"
+        app:tint="#fff" />
 
 </RelativeLayout>

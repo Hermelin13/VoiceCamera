@@ -20,7 +20,7 @@ public class HelpActivity extends AppCompatActivity {
         back.setOnClickListener(v -> closeHelp());
     }
 
-    public void closeHelp(){
+    public void closeHelp() {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
