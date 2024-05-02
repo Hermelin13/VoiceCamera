@@ -10,6 +10,6 @@
     <string name="turn_off_on_flashlight">turn off/on flashlight</string>
     <string name="change_camera">change camera</string>
     <string name="open_help">open help</string>
-    <string name="key_video">recording</string>
-    <string name="key_photo">photograph</string>
+    <string name="key_video">video</string>
+    <string name="key_photo">picture</string>
 </resources>
